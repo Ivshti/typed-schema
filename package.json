@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/Ivshti/typed-schema/issues"
   },
-  "homepage": "https://github.com/Ivshti/typed-schema#readme"
+  "homepage": "https://github.com/Ivshti/typed-schema#readme",
+  "devDependencies": {
+    "tape": "4.x.x"
+  }
 }
