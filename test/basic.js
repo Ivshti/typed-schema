@@ -2,21 +2,35 @@ var tape = require("tape");
 var schema = require("../index");
 
 function Obj(extra) {
+  // WARNING: when using typed-schema in production, it's recommended that you assign values after calling schema(), but this is done so that we test the 'before' case too
+  if (extra) for (k in extra) this[k] = extra[k];
+
   schema(this, {
-    id: "string",
-    count: "number",
+    id: { type: "string", default: "foobar" },
+    count: { type: "number", default: 2 },
     created: "date",
     favNumbers: ["number"],
     name: "string",
     address: { line1: "string", line2: "number" },
+    rName: { type: /^j(.*)y$/i }, // regex-based validation
     firstName: { 
        // getter / setter
       get: function() { return this.name.split(" ")[0] },
       set: function(first) { this.name = first+" "+this.name.split(" ").slice(1).join(" ") } 
     }
   });
-  if (extra) for (k in extra) this[k] = extra[k];
 }
+
+tape("schema default values", function(t) {
+  var o = new Obj({ });
+
+  t.ok(o, "we have object");
+
+  t.equal(o.count, 2, "default value works for number");
+  t.equal(o.id, "foobar", "default value works for string");
+
+  t.end();
+})
 
 tape("schema enforcing number", function(t) {
   var o = new Obj({ id: "test", count: 5 });
@@ -85,9 +99,11 @@ tape("schema arrays", function(t) {
 })
 
 tape("schema getter", function(t) {
-  var o = new Obj({ id: "test" });
+  var o = new Obj({ id: "test", name: "Foo Bar" });
 
   t.ok(o, "we have object");
+
+  t.equals(o.firstName, "Foo", "getter works with values before calling schema()");
 
   o.name = "John Smith";
   t.equals(o.firstName, "John", "getter works");
@@ -98,6 +114,21 @@ tape("schema getter", function(t) {
   t.end();
 })
 
-// TODO
-// TODO
-// MANY OTHER TESTS :) see https://github.com/Ivshti/linvodb3/blob/master/test/schema.test.js
+tape("schema regex-based validation", function(t) {
+  var o = new Obj({ id: "test" });
+
+  t.ok(o, "we have object");
+
+  o.rName = "Jay";
+  t.equals(o.rName, "Jay", "regex-based validation allows compatible value");
+
+  o.rName = "Jason";
+  o.rName = "Foo";
+  t.equals(o.rName, "Jay", "regex-based validation does not allow incompatible values");
+
+  // Should this be expected behaviour?
+  //o.rName = ["Jaimy"];
+  //t.deepEquals(o.rName, ["Jaimy"], "regex-based validation works for arrays");
+
+  t.end();
+})
