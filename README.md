@@ -1,6 +1,6 @@
 # typed-schema
 
-## Define a typed schema for any object
+## Define a typed schema for any object, without extra dependencies
 
 
 ## How to use
@@ -12,11 +12,10 @@
 Schemas are defined as an object of specs for each property. The spec can have properties:
 
 * `type` - the type to be enforced, can be "string", "number", "date" (alternatively use String, Number, Date). Can also be a RegExp instance in case you want to validate against that expression.
-* `default` - the default value; must comply to the type obviously
-* `enumerable` - whether this property will be enumerable
+* `default` - the default value; must comply to the type
 * `get` - getter, cannot be used with type/default
 * `set` - setter, cannot be used with type/default
-* `index`, `sparse`, `unique` - booleans, whether to create an index and it's options
+* `enumerable` - whether this property will be enumerable - the default is true
 
 If type is all you need, you can shorthand the property to the type only, e.g. `{ name: String }`.
 You can also define a property as an "array of" by setting it to `[spec]`, for example `[String]` for an array of strings.
