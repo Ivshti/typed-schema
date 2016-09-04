@@ -2,6 +2,7 @@
 
 ## Define a typed schema for any object, without extra dependencies
 
+This module allows you to set a typed schema for an object that will be enforced constantly, not only on initialization. 
 
 ## How to use
 
@@ -11,7 +12,7 @@
 
 Schemas are defined as an object of specs for each property. The spec can have properties:
 
-* `type` - the type to be enforced, can be "string", "number", "date" (alternatively use String, Number, Date). Can also be a RegExp instance in case you want to validate against that expression.
+* `type` - the type to be enforced, can be "string", "number", "date", "boolean" (alternatively use String, Number, Date, Boolean). Can also be a RegExp instance in case you want to validate against that expression.
 * `default` - the default value; must comply to the type
 * `get` - getter, cannot be used with type/default
 * `set` - setter, cannot be used with type/default
