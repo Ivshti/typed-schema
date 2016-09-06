@@ -4,6 +4,8 @@
 
 This module allows you to set a typed schema for an object that will be enforced constantly, not only on initialization. 
 
+This is similar to Mongoose schemas.
+
 ## How to use
 
 ### ``var schema = require('typed-schema')``
