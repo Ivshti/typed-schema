@@ -38,6 +38,12 @@ function construct(self, schema, opts) {
 	opts = opts || {}
 	opts.onInvalidAssignment = opts.onInvalidAssignment || function() { }
 
+	function tryCast(val, type) {
+		var can = canCast(val, type)
+		if (! can) opts.onInvalidAssignment(val, type);
+		return can
+	}
+
 	// Special case for arrays
 	if (Array.isArray(self)) {
 		var type = schema;
@@ -47,7 +53,7 @@ function construct(self, schema, opts) {
 		while (len--) {
 			if (typeof(self[len])==type) continue;
 
-			if (canCast(self[len], type)) self[len] = castToType(self[len], type);
+			if (tryCast(self[len], type)) self[len] = castToType(self[len], type);
 			else self.splice(len, 1);
 		};
 		return self;
@@ -67,24 +73,22 @@ function construct(self, schema, opts) {
 		if (! spec.type) return; 
 
 		var val;
-		if (self.hasOwnProperty(key) && canCast(self[key], spec.type)) val = castToType(self[key], spec.type);
-		else if (spec.hasOwnProperty("default") && canCast(spec.default, spec.type)) val = castToType(spec.default, spec.type);
+		if (self.hasOwnProperty(key) && tryCast(self[key], spec.type)) val = castToType(self[key], spec.type);
+		else if (spec.hasOwnProperty("default") && tryCast(spec.default, spec.type)) val = castToType(spec.default, spec.type);
 		else val = defaultValue(spec.type);
 
-		if (spec.schema) construct(val, spec.schema);
+		if (spec.schema) construct(val, spec.schema, opts);
 
 		Object.defineProperty(self, key, { 
 			enumerable: true, 
 			get: spec.type=="array" ? 
-				function() { construct(val, spec.schema); return val } :
+				function() { construct(val, spec.schema, opts); return val } :
 				function() { return val },
 			set: function(v) {
-				if (canCast(v, spec.type)) {
+				if (tryCast(v, spec.type)) {
 					var oldVal = val;
 					val = castToType(v, spec.type);
-					if (spec.schema && val!=oldVal) construct(val, spec.schema);
-				} else {
-					opts.onInvalidAssignment(v, spec.type);
+					if (spec.schema && val!=oldVal) construct(val, spec.schema, opts);
 				}
 			}
 		});

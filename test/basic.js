@@ -137,15 +137,64 @@ tape("schema onInvalidAssignment", function(t) {
   t.plan(3)
 
   var o = new Obj({ count: 7 }, { onInvalidAssignment: function(val, type) {
-    t.ok(o.count, "on invalid assignment");
+    t.ok(val === "kur", "we tried invalid value");
   }});
-
   t.ok(o, "we have object");
   t.equal(o.count, 7, "control value");
-
   o.count = "kur";
   
+  t.end();
+})
+
+tape("schema onInvalidAssignment, on default", function(t) {
+  t.plan(3)
+
+  var o = new Obj({ count: 7 }, { onInvalidAssignment: function(val, type) {
+    t.ok(val === "kur", "we tried invalid value");
+  }});
+  t.ok(o, "we have object");
+  t.equal(o.count, 7, "control value");
+  o.count = "kur";
+  
+  t.end();
+})
+
+tape("schema onInvalidAssignment, on initial value", function(t) {
+  t.plan(2)
+
+  var o = new Obj({ count: "kur" }, { onInvalidAssignment: function(val, type) {
+    t.ok(val === "kur", "we tried invalid value");
+  }});
+  t.ok(o, "we have object");
+  
+  t.end();
+})
+
+tape("schema onInvalidAssignment, on default value", function(t) {
+  t.plan(1)
+
+  var o = { };
+  schema(o, {
+    id: { type: "number", default: "foobar" },
+  }, { onInvalidAssignment: function(val, type) {
+    t.ok(val === "foobar", "we tried invalid value as a default");
+  }});
+  
+  t.end();
+})
+
+tape("schema onInvalidAssignment, on array", function(t) {
+  t.plan(2)
+
+  var o = new Obj({ id: "test" }, { onInvalidAssignment: function(val, type) {
+    t.ok(val === "kur", "we tried invalid value");
+  }});
+  t.ok(o, "we have object");
+  o.favNumbers.push("kur");
+  o.favNumbers; // get, so we can run the validator
 
   t.end();
 })
+
+
 
