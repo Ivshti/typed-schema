@@ -34,7 +34,10 @@ function normalize(schema) {
 	return schema;
 };
 
-function construct(self, schema) {
+function construct(self, schema, opts) {
+	opts = opts || {}
+	opts.onInvalidAssignment = opts.onInvalidAssignment || function() { }
+
 	// Special case for arrays
 	if (Array.isArray(self)) {
 		var type = schema;
@@ -80,6 +83,8 @@ function construct(self, schema) {
 					var oldVal = val;
 					val = castToType(v, spec.type);
 					if (spec.schema && val!=oldVal) construct(val, spec.schema);
+				} else {
+					opts.onInvalidAssignment(v, spec.type);
 				}
 			}
 		});
@@ -132,6 +137,6 @@ function defaultValue(spec)
 	})[spec];
 };
 
-module.exports = function(self, schema) {
-	return construct(self, normalize(schema));
+module.exports = function(self, schema, opts) {
+	return construct(self, normalize(schema), opts);
 };

@@ -1,7 +1,7 @@
 var tape = require("tape");
 var schema = require("../index");
 
-function Obj(extra) {
+function Obj(extra, opts) {
   // WARNING: when using typed-schema in production, it's recommended that you assign values after calling schema(), but this is done so that we test the 'before' case too
   if (extra) for (k in extra) this[k] = extra[k];
 
@@ -18,7 +18,7 @@ function Obj(extra) {
       get: function() { return this.name.split(" ")[0] },
       set: function(first) { this.name = first+" "+this.name.split(" ").slice(1).join(" ") } 
     }
-  });
+  }, opts);
 }
 
 tape("schema default values", function(t) {
@@ -58,7 +58,6 @@ tape("schema enforcing string", function(t) {
 
   t.end();
 })
-
 
 tape("schema enforcing date", function(t) {
   var o = new Obj({ id: "test" });
@@ -132,3 +131,21 @@ tape("schema regex-based validation", function(t) {
 
   t.end();
 })
+
+
+tape("schema onInvalidAssignment", function(t) {
+  t.plan(3)
+
+  var o = new Obj({ count: 7 }, { onInvalidAssignment: function(val, type) {
+    t.ok(o.count, "on invalid assignment");
+  }});
+
+  t.ok(o, "we have object");
+  t.equal(o.count, 7, "control value");
+
+  o.count = "kur";
+  
+
+  t.end();
+})
+
