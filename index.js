@@ -102,10 +102,10 @@ function canCast(val, spec)
 {
 	if (spec === true || spec=="mixed") return true;
 	if (spec=="array" && Array.isArray(val)) return true;
-	if (typeof(val) == spec) return true;
+	if (typeof(val) == spec && !(typeof(val) == 'number' && isNaN(val))) return true; // NaN is unacceptable if we want a number
 	if (spec == "string" && val && val.toString) return true;
 	//if (spec == "regexp" && typeof(val))
-	if (spec == "number" && !isNaN(val)) return true;
+	if (spec == "number" && !isNaN(parseFloat(val))) return true;
 	if (spec == "date" && !isNaN(new Date(val).getTime())) return true;
 	if (spec == "boolean" && !isNaN(val)) return true;
 	if (spec.constructor.name === "RegExp" && val.toString && spec.test(val)) return true;
