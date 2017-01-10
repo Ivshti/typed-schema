@@ -59,6 +59,22 @@ tape("schema enforcing string", function(t) {
   t.end();
 })
 
+tape("schema enforcing number - no NaNs", function(t) {
+  var o = new Obj({  });
+
+  t.ok(o, "we have object");
+
+  t.equal(o.count, 2);
+
+  o.count = NaN;
+  t.equal(o.count, 2, 'not changed when we try setting to NaN');
+
+  o.count = 5;
+  t.equal(o.count, 5);
+
+  t.end();
+})
+
 tape("schema enforcing date", function(t) {
   var o = new Obj({ id: "test" });
 
