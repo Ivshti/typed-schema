@@ -3,39 +3,6 @@
  * */
 var specAllowedKeys = ["type", "index", "unique", "sparse", "default", "get", "set", "enumerable"];
 
-function isComplexSpec(spec)
-{
-	return typeof(spec) == "object" && !Array.isArray(spec)
-		&& Object.keys(spec).every(function(x) { return specAllowedKeys.indexOf(x) !== -1 });
-};
-
-function mapSpec(spec)
-{
-	if (spec === String) return "string";
-	if (spec === Number) return "number";
-	if (spec === Object) return "object";
-	if (spec === Array) return "array";
-	if (spec === Boolean) return "boolean";
-	if (spec == Date) return "date";
-	return spec;
-};
-
-// Allow for short-hands in schemas
-// e.g. just "string" instead of { type: "string" }
-function normalize(schema) {
-	var spec, key;
-
-	for (key in schema) {
-		spec = schema[key];
-		if (isComplexSpec(spec)) { spec.type = mapSpec(spec.type); }
-		else if (Array.isArray(spec)) schema[key] = { schema: mapSpec(spec[0]) || undefined, type: "array" };
-		else if (typeof(spec) == "object") schema[key] = { schema: normalize(spec), type: "object" };
-		else schema[key] = { type: mapSpec(spec) };
-	};
-
-	return schema;
-};
-
 function construct(self, schema, opts) {
 	opts = opts || {}
 	opts.onInvalidAssignment = opts.onInvalidAssignment || function() { }
@@ -48,7 +15,7 @@ function construct(self, schema, opts) {
 
 	// Special case for arrays
 	if (Array.isArray(self)) {
-		var type = schema;
+		var type = schema.type;
 		if (! type) return self;
 
 		var len = self.length;
@@ -141,5 +108,5 @@ function defaultValue(spec)
 };
 
 module.exports = function(self, schema, opts) {
-	return construct(self, normalize(schema), opts);
+	return construct(self, schema, opts);
 };

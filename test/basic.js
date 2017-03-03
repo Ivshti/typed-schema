@@ -1,24 +1,26 @@
 var tape = require("tape");
 var schema = require("../index");
 
+var SCHEMA = {
+  id: { type: "string", default: "foobar" },
+  count: { type: "number", default: 2 },
+  created: { type: "date" },
+  favNumbers: { type: "array", schema: { type: "number" } },
+  name: { type: "string" },
+  address: { type: "object", schema: { line1: { type: "string" }, line2: {type: "number" } } },
+  rName: { type: /^j(.*)y$/i }, // regex-based validation
+  firstName: { 
+     // getter / setter
+    get: function() { return this.name.split(" ")[0] },
+    set: function(first) { this.name = first+" "+this.name.split(" ").slice(1).join(" ") } 
+  }
+}
+
 function Obj(extra, opts) {
   // WARNING: when using typed-schema in production, it's recommended that you assign values after calling schema(), but this is done so that we test the 'before' case too
   if (extra) for (k in extra) this[k] = extra[k];
 
-  schema(this, {
-    id: { type: "string", default: "foobar" },
-    count: { type: "number", default: 2 },
-    created: "date",
-    favNumbers: ["number"],
-    name: "string",
-    address: { line1: "string", line2: "number" },
-    rName: { type: /^j(.*)y$/i }, // regex-based validation
-    firstName: { 
-       // getter / setter
-      get: function() { return this.name.split(" ")[0] },
-      set: function(first) { this.name = first+" "+this.name.split(" ").slice(1).join(" ") } 
-    }
-  }, opts);
+  schema(this, SCHEMA, opts);
 }
 
 tape("schema default values", function(t) {
