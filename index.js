@@ -68,29 +68,33 @@ function construct(self, schema, opts) {
 
 function canCast(val, spec)
 {
-	if (spec === true || spec=="mixed") return true;
-	if (spec=="array" && Array.isArray(val)) return true;
-	if (typeof(val) == spec && !(typeof(val) == 'number' && isNaN(val))) return true; // NaN is unacceptable if we want a number
-	if (spec == "string" && val && val.toString) return true;
+	var type = typeof(val);
+
+	if (type === spec && !(type === 'number' && isNaN(val))) return true; // NaN is unacceptable if we want a number
+
+	if (spec === "mixed") return true;
+	if (spec === "array" && Array.isArray(val)) return true;
+	if (spec === "string" && val && val.toString) return true;
 	//if (spec == "regexp" && typeof(val))
-	if (spec == "number" && !isNaN(parseFloat(val))) return true;
-	if (spec == "date" && !isNaN(new Date(val).getTime())) return true;
-	if (spec == "boolean" && !isNaN(val)) return true;
+	if (spec === "number" && !isNaN(parseFloat(val))) return true;
+	if (spec === "date" && !isNaN(new Date(val).getTime())) return true;
+	if (spec === "boolean" && !isNaN(val)) return true;
 	if (spec.constructor.name === "RegExp" && val.toString && spec.test(val)) return true;
 	return false;
 };
 
 function castToType(val, spec)
 {
-	if (spec===true || spec=="mixed") return val;
-	if (spec=="array" && Array.isArray(val)) return val;	
 	if (typeof(val) == spec) return val;
-	if (spec == "string") return val.toString();
-	if (spec == "number") return parseFloat(val);
-	if (spec == "boolean") return !!val;
-	if (spec == "date") return new Date(val);
+	if (spec === "mixed") return val;
+	if (spec === "array" && Array.isArray(val)) return val;	
+	if (spec === "string") return val.toString();
+	if (spec === "number") return parseFloat(val);
+	if (spec === "boolean") return !!val;
+	if (spec === "date") return new Date(val);
 	if (spec.constructor.name === "RegExp") return val.toString();
 };
+
 
 // TODO: copy from validate.js
 function defaultValue(spec)
