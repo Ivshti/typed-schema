@@ -23,13 +23,15 @@ function mapSpec(spec)
 // Allow for short-hands in schemas
 // e.g. just "string" instead of { type: "string" }
 function normalize(schema) {
-	Object.keys(schema).forEach(function(key) {
-		var spec = schema[key];
-		if (isComplexSpec(spec)) { spec.type = mapSpec(spec.type); return; }
+	var spec, key;
+
+	for (key in schema) {
+		spec = schema[key];
+		if (isComplexSpec(spec)) { spec.type = mapSpec(spec.type); }
 		else if (Array.isArray(spec)) schema[key] = { schema: mapSpec(spec[0]) || undefined, type: "array" };
 		else if (typeof(spec) == "object") schema[key] = { schema: normalize(spec), type: "object" };
 		else schema[key] = { type: mapSpec(spec) };
-	});
+	};
 
 	return schema;
 };
@@ -60,9 +62,10 @@ function construct(self, schema, opts) {
 	};
 
 	// Dynamic getter/setter for objects
-	Object.keys(schema).forEach(function(key) {
+	var key;
+	for (key in schema) (function() { 
 		var spec = schema[key];
-		
+
 		if (spec.get || spec.set) {
 			var val = self[key], hasVal = self.hasOwnProperty(key);
 			Object.defineProperty(self, key, { get: spec.get, set: spec.set, enumerable: true });
@@ -92,8 +95,8 @@ function construct(self, schema, opts) {
 				}
 			}
 		});
-	});
-	
+	})(key);
+
 	return self;
 };
 
