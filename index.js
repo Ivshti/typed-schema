@@ -46,7 +46,8 @@ function construct(self, schema, opts) {
 
 		if (spec.schema) construct(val, spec.schema, opts);
 
-		Object.defineProperty(self, key, { 
+		if (opts.staticByDefault && !spec.dynamic) self[key] = val;
+		else Object.defineProperty(self, key, { 
 			enumerable: true, 
 			get: spec.type=="array" ? 
 				function() { construct(val, spec.schema, opts); return val } :

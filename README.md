@@ -20,6 +20,7 @@ Schemas are defined as an object of specs for each property. The spec can have p
 * `set` - setter, cannot be used with type/default
 * `enumerable` - whether this property will be enumerable - the default is true
 * `schema` - applicable if you set the type to "object" or "array"; the value follows the same spec
+* `dynamic` - enforce dynamically or only on construction, `true` by default, but can be `false` by default by setting `opts.staticByDefault`
 
 Validating arrays is supported by setting the `type` to `"array"` and providing the `schema` property.
 Nested objects are supported by setting the `type` to `"object"` and providing the `schema` property.
