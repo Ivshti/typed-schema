@@ -127,18 +127,14 @@ function castToType(val, spec)
 // TODO: copy from validate.js
 function defaultValue(spec)
 {
-  if (spec.constructor.name === "RegExp") return "";
-	return ({
-		"string": "",
-		"id": null,
-		"number": 0,
-		"boolean": false,
-		"date": new Date(),
-		"regexp": new RegExp(),
-		"function": function() { },
-		"array": [],
-		"object": {}
-	})[spec];
+	if (spec.constructor.name === "RegExp") return "";
+	if (spec === "string") return "";
+	if (spec === "number") return 0;
+	if (spec === "boolean") return false;
+	if (spec === "date") return new Date();
+	if (spec === "regexp") return new RegExp();
+	if (spec === "array") return [];
+	if (spec === "object") return {};
 };
 
 module.exports = function(self, schema, opts) {
