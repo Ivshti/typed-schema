@@ -1,7 +1,4 @@
-/* We can pass an object as a spec which really describes a single type, and not a sub-object
- * e.g. { type: "string", index: true }
- * */
-var specAllowedKeys = ["type", "index", "unique", "sparse", "default", "get", "set", "enumerable"];
+//var specAllowedKeys = ["type", "index", "unique", "sparse", "default", "get", "set", "enumerable"];
 
 function construct(self, schema, opts) {
 	opts = opts || {}

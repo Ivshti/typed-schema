@@ -14,15 +14,15 @@ This is similar to Mongoose schemas.
 
 Schemas are defined as an object of specs for each property. The spec can have properties:
 
-* `type` - the type to be enforced, can be "string", "number", "date", "boolean" (alternatively use String, Number, Date, Boolean). Can also be a RegExp instance in case you want to validate against that expression.
+* `type` - the type to be enforced, can be "string", "number", "date", "boolean". Can also be a RegExp instance in case you want to validate against that expression. It can be "object" or "array", but keep in mind then you need to also specify `schema` property
 * `default` - the default value; must comply to the type
 * `get` - getter, cannot be used with type/default
 * `set` - setter, cannot be used with type/default
 * `enumerable` - whether this property will be enumerable - the default is true
+* `schema` - applicable if you set the type to "object" or "array"; the value follows the same spec
 
-If type is all you need, you can shorthand the property to the type only, e.g. `{ name: String }`.
-You can also define a property as an "array of" by setting it to `[spec]`, for example `[String]` for an array of strings.
-Nested objects are supported.
+Validating arrays is supported by setting the `type` to `"array"` and providing the `schema` property.
+Nested objects are supported by setting the `type` to `"object"` and providing the `schema` property.
 
 ### Example
 
@@ -32,13 +32,13 @@ var schema = require('typed-schema')
 function Person() {
 	schema(this, {
 		name: { type: 'string', default: 'nameless' },
-		age: 'number', // shorthand to { type: ... },
-		created: Date, // you can also use String, Number, Date instead of 'string', 'number', 'date'
+		age: { type: 'number' },
+		created: 'date',
 		address: {
 			line1: 'string',
 			line2: 'string'
 		},
-		favNumbers: ['number'], // array of numbers
+		favNumbers: { type: 'array', schema: { type: 'number' } }, // array of numbers
 		firstName: { get: function() { return this.name.split(" ")[0] } } // getter
 	})
 
