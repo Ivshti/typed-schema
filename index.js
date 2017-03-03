@@ -2,11 +2,10 @@
 
 function construct(self, schema, opts) {
 	opts = opts || {}
-	opts.onInvalidAssignment = opts.onInvalidAssignment || function() { }
 
 	function tryCast(val, type) {
 		var can = canCast(val, type)
-		if (! can) opts.onInvalidAssignment(val, type);
+		if (!can && opts.onInvalidAssignment) opts.onInvalidAssignment(val, type);
 		return can
 	}
 
@@ -72,13 +71,13 @@ function canCast(val, spec)
 
 	if (type === spec && !(type === 'number' && isNaN(val))) return true; // NaN is unacceptable if we want a number
 
+	if (spec === "string" && val && val.toString) return true;
+	if (spec === "number" && !isNaN(parseFloat(val))) return true;
+	if (spec === "boolean" && !isNaN(val)) return true;
 	if (spec === "mixed") return true;
 	if (spec === "array" && Array.isArray(val)) return true;
-	if (spec === "string" && val && val.toString) return true;
 	//if (spec == "regexp" && typeof(val))
-	if (spec === "number" && !isNaN(parseFloat(val))) return true;
 	if (spec === "date" && !isNaN(new Date(val).getTime())) return true;
-	if (spec === "boolean" && !isNaN(val)) return true;
 	if (spec.constructor.name === "RegExp" && val.toString && spec.test(val)) return true;
 	return false;
 };
@@ -86,12 +85,12 @@ function canCast(val, spec)
 function castToType(val, spec)
 {
 	if (typeof(val) == spec) return val;
-	if (spec === "mixed") return val;
-	if (spec === "array" && Array.isArray(val)) return val;	
 	if (spec === "string") return val.toString();
 	if (spec === "number") return parseFloat(val);
 	if (spec === "boolean") return !!val;
 	if (spec === "date") return new Date(val);
+	if (spec === "array" && Array.isArray(val)) return val;	
+	if (spec === "mixed") return val;
 	if (spec.constructor.name === "RegExp") return val.toString();
 };
 
@@ -99,7 +98,6 @@ function castToType(val, spec)
 // TODO: copy from validate.js
 function defaultValue(spec)
 {
-	if (spec.constructor.name === "RegExp") return "";
 	if (spec === "string") return "";
 	if (spec === "number") return 0;
 	if (spec === "boolean") return false;
@@ -107,6 +105,7 @@ function defaultValue(spec)
 	if (spec === "regexp") return new RegExp();
 	if (spec === "array") return [];
 	if (spec === "object") return {};
+	if (spec.constructor.name === "RegExp") return "";
 };
 
 module.exports = function(self, schema, opts) {
